@@ -1,0 +1,577 @@
+<html>
+<head>
+<title>Puzzle-Generator von onlinewahn.de, Puzzles f&uuml;r Deine Homepage!</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<style type="text/css">
+<!--
+body {margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px;}
+table {margin:0px; padding:0px;}
+td {font-family:'Comic Sans MS'; font-size:16px; line-height:18px; text-align:center; letter-spacing:0px; margin:0px; padding-left:6px; padding-right:6px; padding-top:0px; padding-bottom:2px;}
+b {letter-spacing:2px;}
+a {text-decoration:none;}
+-->
+</style>
+<script type="text/javascript">
+<!--
+self.focus();
+var xleer;
+var yleer;
+var teilx;
+var teily;
+var teilnr;
+var ie = (document.all);
+var bewegteil = null;
+var gesperrt = true;
+var z = 10;
+var a;
+var vzeit;
+var weiter = false;
+var wbx = 0;
+var wby = 0
+var wbh = 60
+var xabstand;
+var yabstand;
+var startzeit;
+var fbreite;
+var fhoehe;
+function abbrechen()
+{
+  return false;
+}
+document.onselectstart = abbrechen;
+document.ondragstart = abbrechen;
+gerastet = new Array(56);
+for (n=0; n<56; n++)
+{
+  gerastet[n] = new Array(56);
+  gerastet[n][n] = true;
+}xwert = new Array(0,60,120,180,240,300,360,0,60,120,180,240,300,360,0,60,120,180,240,300,360,0,60,120,180,240,300,360,0,60,120,180,240,300,360,0,60,120,180,240,300,360,0,60,120,180,240,300,360,0,60,120,180,240,300,360);
+ywert = new Array(4,4,4,4,4,4,4,79,79,79,79,79,79,79,154,154,154,154,154,154,154,229,229,229,229,229,229,229,304,304,304,304,304,304,304,379,379,379,379,379,379,379,454,454,454,454,454,454,454,529,529,529,529,529,529,529);
+xpos = new Array;
+ypos = new Array;
+
+function aktivierung()
+{
+  if (fbreite == erstbreite && fhoehe == ersthoehe)
+  for (n=0; n<56; n++)
+  {
+    ustl = document.getElementById(n);
+    if (ie)
+    ustl.unselectable = true;
+    else
+    ustl.style.MozUserSelect = "none";
+  }
+  document.onmousemove = bewegen;
+  document.onmouseup = ablegen;
+  window.setTimeout("mischen()", 1);
+}
+
+function mischen()
+{
+  gesperrt = true;
+  for (a=3; a>0; a--)
+  {
+    xabstand = 60+a;
+    yabstand = 75+a;
+    for (n=0; n<56; n++)
+    for (m=0; m<56; m++)
+    {
+      if (Math.abs(xpos[n]-xpos[m]) < xabstand && Math.abs(ypos[n]-ypos[m]) < yabstand)
+      {
+        if (xpos[n]<xpos[m])
+        {
+          if (xpos[n]>a)
+          xpos[n]-=a;
+          if (xpos[m]<fbreite-a)
+          xpos[m]+=a;
+        }
+        else
+        {
+          if (xpos[n]<fbreite-a)
+          xpos[n]+=a;
+          if (xpos[m]>a)
+          xpos[m]-=a;
+        }
+        if (ypos[n]<ypos[m])
+        {
+          if (ypos[n]>a)
+          ypos[n]-=a;
+          if (ypos[m]<fhoehe-a)
+          ypos[m]+=a;
+        }
+        else
+        {
+          if (ypos[n]<fhoehe-a)
+          ypos[n]+=a;
+          if (ypos[m]>a)
+          ypos[m]-=a;
+        }
+      }
+    }
+  }
+  for (n=0; n<56; n++)
+  {
+    document.getElementById(n).style.left = xpos[n] + "px";
+    document.getElementById(n).style.top = ypos[n] + "px";
+    xwert[n] += bkx;
+    ywert[n] += bky;
+  }
+  startzeit = new Date();
+  gesperrt = false;
+}
+
+function greifen(element)
+{
+  if(bewegteil == null && !gesperrt)
+  {
+    teilx = xleer;
+    teily = yleer;
+    ofx = ie ? event.offsetX+element.offsetLeft : teilx;
+    ofy = ie ? event.offsetY+element.offsetTop : teily;
+    n = parseInt(element.id);
+    if (ofx-xpos[n]>23 && ofx-xpos[n] < 84 && ofy-ypos[n]>23 && ofy-ypos[n] < 99)
+    bewegteil = document.getElementById(n);
+    else
+    for (n=0; n<56; n++)
+    if (ofx-xpos[n]>23 && ofx-xpos[n] < 84)
+    if (ofy-ypos[n]>23 && ofy-ypos[n] < 99)
+    {
+      bewegteil = document.getElementById(n);
+      break;
+    }
+    if (bewegteil != null)
+    {
+      teilnr = n;      teilx -= xpos[teilnr];
+      teily -= ypos[teilnr];
+      bewegteil.style.zIndex = z;
+      z++;
+      document.getElementById("leiste").style.zIndex = z;
+    }
+  }
+}
+function bewegen(ereignis)
+{
+  if(bewegteil != null && !gesperrt)
+  {
+    xpos[teilnr] = (ie ? window.event.screenX + document.body.scrollLeft : ereignis.pageX)  - teilx;
+    ypos[teilnr] = (ie ? window.event.screenY + document.body.scrollTop : ereignis.pageY) - teily;
+    bewegteil.style.left = (xpos[teilnr]) + "px";
+    bewegteil.style.top = (ypos[teilnr]) + "px";
+    for (n=0; n<56; n++)
+    if (gerastet[teilnr][n])
+    {
+      document.getElementById(n).style.left = (xpos[teilnr]-xwert[teilnr]+xwert[n]) + "px";
+      document.getElementById(n).style.top =  (ypos[teilnr]-ywert[teilnr]+ywert[n]) + "px";
+    }
+  }
+  else
+  {
+    xleer = ie ? window.event.screenX + document.body.scrollLeft : ereignis.pageX;
+    yleer = ie ? window.event.screenY + document.body.scrollTop : ereignis.pageY;
+  }
+}
+function ablegen()
+{
+  if(bewegteil != null)
+  {
+    gesperrt = true;
+    k = 0;
+    sieg = false;
+    if (xpos[teilnr]<-30)
+    xpos[teilnr] = -30;
+    if (ypos[teilnr]<-30)
+    ypos[teilnr] = -30;
+    j = 0;
+    for (r=0; r<56; r++)
+    if (gerastet[teilnr][r])
+    {
+      xpos[r] = xpos[teilnr]+xwert[r]-xwert[teilnr];
+      ypos[r] = ypos[teilnr]+ywert[r]-ywert[teilnr];
+      for (n=r-7; n<=r+7; n+=6)
+      {
+        if (n==r+5)
+        n = r+1;
+        if (n>=0 && n<56)
+        if (!gerastet[r][n])
+        if (Math.abs(xwert[r]-xwert[n]) < 61)
+        if (Math.abs(xpos[r]+xwert[n]-xwert[r]-xpos[n]) < 15)
+        if (Math.abs(ypos[r]+ywert[n]-ywert[r]-ypos[n]) < 15)
+        if (Math.abs(xpos[r]+xwert[n]-xwert[r]-xpos[n]) + Math.abs(ypos[r]+ywert[n]-ywert[r]-ypos[n]) < 21)
+        {
+          if (xpos[r]!=xwert[r] || ypos[r]!=ywert[r])
+          {
+            xpos[r] = xpos[n]+xwert[r]-xwert[n];
+            ypos[r] = ypos[n]+ywert[r]-ywert[n];
+          }
+          for (m=0; m<56; m++)
+          if(gerastet[r][m])
+          {
+            xpos[m] = xpos[r]+xwert[m]-xwert[r];
+            ypos[m] = ypos[r]+ywert[m]-ywert[r];
+          }
+          k = 0;
+          for (m=0; m<56; m++)
+          {
+            if (gerastet[m][n])
+            {
+              k++;
+              for (o=0; o<56; o++)
+              {
+                if (gerastet[o][r])
+                {
+                  gerastet[o][m] = true;
+                  gerastet[m][o] = true;
+                }
+              }
+              gerastet[m][r] = true;
+              gerastet[r][m] = true;
+            }
+            else if (gerastet[m][r])
+            k++;
+          }
+          if (k==56)
+          sieg = true;
+        }
+      }
+      j+=k;
+    }
+    for (n=0; n<56; n++)
+    if (gerastet[teilnr][n])
+    {
+      xpos[n] = xpos[teilnr]+xwert[n]-xwert[teilnr];
+      ypos[n] = ypos[teilnr]+ywert[n]-ywert[teilnr];
+      document.getElementById(n).style.left = (xpos[n]) + "px";
+      document.getElementById(n).style.top = (ypos[n]) + "px";
+    }
+    bewegteil = null;
+    gesperrt = false;
+    xleer = xpos[teilnr]+teilx;
+    yleer = ypos[teilnr]+teily;
+    if (sieg)
+    {
+      var siegzeit = new Date();
+      var sekunden = Math.floor((siegzeit.getTime()-startzeit.getTime())/1000);
+      var minuten = Math.floor(sekunden/60);
+      sekunden = sekunden - 60*minuten;
+      var stunden = Math.floor(minuten/60);
+      minuten = minuten - 60*stunden;
+      var tage = Math.floor(stunden/24);
+      stunden = stunden - 24*tage;
+      var zeittext = "Benötigte Zeit:\n";
+      var angabe = false;
+      if (tage > 0)
+      {
+        if (tage == 1)
+        zeittext += "1 Tag, ";
+        else
+        zeittext += String(tage) + " Tage, ";
+        angabe = true;
+      }
+      if (stunden > 0 || angabe)
+      {
+        if (stunden == 1)
+        zeittext += "1 Stunde, ";
+        else
+        zeittext += String(stunden) + " Stunden, ";
+        angabe = true;
+      }
+      if (minuten > 0 || angabe)
+      {
+        if (minuten == 1)
+        zeittext += "1 Minute und ";
+        else
+        zeittext += String(minuten) + " Minuten und ";
+      }
+      if (sekunden == 1)
+      zeittext += "1 Sekunde, ";
+      else
+      zeittext += String(sekunden) + " Sekunden.";
+      alert ("Herzlichen Glückwunsch!\nAlle Teile zusammengefügt.\n\n"+zeittext+"\n\nZum Erstellen eines neuen Puzzles\nPuzzle-Generator Button (oben rechs) \nklicken. ");
+      sieg = false;
+    }
+  }
+}
+function aufdeck()
+{
+  for (n=0; n<56; n++)
+  {
+   r = 0;
+   for (m=0; m<56; m++)
+   if (gerastet[n][m])
+   r++;
+      if (r>20 || (r>10 && xpos[n] == xwert[n] && ypos[n] == ywert[n]))
+   document.getElementById(n).style.zIndex = 0;
+   else
+   document.getElementById(n).style.zIndex = z - parseInt(document.getElementById(n).style.zIndex);
+  }
+}
+function verteil()
+{
+  if (weiter)
+  {
+    window.clearTimeout(vzeit);
+    weiter = true;
+    vzeit = window.setTimeout("weiter = false;", 2000);
+  }
+  else
+  {
+    weiter = true;
+    vzeit = window.setTimeout("weiter = false;", 1000);
+    a = 2;
+    schieben();
+  }
+}
+function schieben()
+{
+  a = 5 - a;
+  xabstand = 60+Math.ceil(24*Math.random());
+  yabstand = 75+Math.ceil(24*Math.random());
+  for (n=0; n<56; n++)
+  {
+    r = 0;
+    if (xpos[n]==xwert[n] && ypos[n]==ywert[n])
+    r = 56;
+    else
+    for (m=0; m<56; m++)
+    if (gerastet[m][n])
+    r++;
+    if (r<2)
+    for (m=0; m<56; m++)
+    {
+      if (Math.abs(xpos[n]-xpos[m]) < xabstand && Math.abs(ypos[n]-ypos[m]) < yabstand)
+      if (m != n)
+      {
+        if (xpos[n]<xpos[m])
+        {
+          if (xpos[n]>a)
+          xpos[n]-=a;
+        }
+        else
+        {
+          if (xpos[n]<fbreite-a)
+          xpos[n]+=a;
+        }
+        if (ypos[n]<ypos[m])
+        {
+          if (ypos[n]>a+20)
+          ypos[n]-=a;
+        }
+        else
+        {
+          if (ypos[n]<fhoehe+wbh-a)
+          ypos[n]+=a;
+        }
+      }
+    }
+    document.getElementById(n).style.left = xpos[n] + "px";
+    document.getElementById(n).style.top = ypos[n] + "px";
+  } 
+  if (weiter)
+  window.setTimeout("schieben();", 50);
+}
+//-->
+</script>
+</HEAD>
+<BODY bgcolor="#C8C8C8" text="#F00000" topmargin="0" marginheight="0" scroll="auto" onload="aktivierung()" id="gesamt">
+<center>
+<table id="leiste" cellpadding="0" cellspacing="0" style="position:absolute; top:0px; left:0px; z-index:10;"><tr>
+<td bgcolor="#E0E0E0" title="bringt verdeckte Teile an die Oberfl&auml;che"><nobr><a id="vth" href="javascript:aufdeck();">verdeckte&nbsp;Teile&nbsp;hoch</a></nobr></td>
+<td>&nbsp;</td>
+<td bgcolor="#E0E0E0" title="lose Teile werden besser verteilt"><nobr><a id="etf" href="javascript:verteil();">Einzelteile&nbsp;freir&auml;umen</a></nobr></td>
+<td>&nbsp;</td>
+<script type="text/javascript">
+<!--
+var bvl  = 12;
+var hvl = 80;
+if (!ie)
+{
+  if (window.innerWidth == 0 || screen.availWidth == 0)
+  {
+    window.resizeTo (600,400);
+    window.setTimeout("location.reload();", 950);
+  }
+  bvl = window.outerWidth - window.innerWidth;
+  hvl = window.outerHeight - window.innerHeight;
+}
+var erstbreite = screen.availWidth-bvl;
+var ersthoehe = screen.availHeight-hvl;
+//wbh = 0;
+//if (ersthoehe > 732)
+wbh = 60;
+if (ersthoehe > 1368+wbh)
+ersthoehe = 1320+wbh;
+if (erstbreite > 1008 && erstbreite*(ersthoehe-wbh) > 1539000)
+{
+  erstbreite = Math.floor(1377000/ersthoehe);
+  if (erstbreite < 960)
+  erstbreite = 960;
+}
+if (document.getElementById("leiste").offsetWidth > erstbreite)
+for (n=0; n<9; n++)
+{
+  document.getElementsByTagName("td")[0].paddingLeft="6px";
+  document.getElementsByTagName("td")[0].paddingRight="6px";
+}
+if (document.getElementById("leiste").offsetWidth > erstbreite)
+document.getElementById("vth").firstChild.nodeValue = "verdeckte T...";
+if (document.getElementById("leiste").offsetWidth > erstbreite)
+document.getElementById("etf").firstChild.nodeValue = "freiräumen";
+if (document.getElementById("leiste").offsetWidth > erstbreite)
+document.getElementById("pgr").firstChild.nodeValue = "Puzzle-Gen...";
+if (document.getElementById("leiste").offsetWidth > erstbreite)
+for (n=0; n<9; n++)
+{
+  document.getElementsByTagName("td")[0].paddingLeft="4px";
+  document.getElementsByTagName("td")[0].paddingRight="4px";
+}
+if (document.getElementById("leiste").offsetWidth > erstbreite)
+erstbreite = document.getElementById("leiste").offsetWidth;
+self.focus();
+window.resizeTo (erstbreite+bvl,ersthoehe+hvl);
+document.getElementById("leiste").style.left = ""+Math.floor((erstbreite-document.getElementById("leiste").offsetWidth)/2) + "px";
+self.moveTo(Math.floor((screen.availWidth-erstbreite-bvl)/2),Math.ceil((screen.availHeight-ersthoehe-hvl)/2));
+if (ie)
+{
+  erstbreite = document.all.gesamt.offsetWidth;
+  ersthoehe = document.all.gesamt.offsetHeight;
+}
+var bposx = Math.floor((erstbreite-420)/2) - 25;
+var bposy = Math.floor((ersthoehe-600-wbh)/2) - 25;
+if (bposx < 0)
+bposx = 0;
+if (bposy < 0)
+bposy = 0;
+bposy+=4;
+erstbreite -= 111;
+ersthoehe -= (126+wbh);
+var fbreite = erstbreite;
+var fhoehe = ersthoehe;
+if (fbreite < 357)
+fbreite = 357;
+if (fhoehe < 522)
+fhoehe = 522;
+if (fhoehe*fbreite < 567000)
+fhoehe = Math.floor(630000/fbreite);
+if (fbreite == erstbreite && fhoehe > ersthoehe)
+fbreite -=25;
+
+abx = 126;aby = 148;
+bnrx = Math.floor(erstbreite-360)/2;
+if (bnrx < 0)
+bnrx = 0;
+for (n=0; n<56; n++)
+{
+  do
+  {
+    do
+    {
+      xpos[n] = Math.floor((fbreite)*Math.random());
+      ypos[n] = Math.floor((fhoehe+wbh-20)*Math.random()) + 20;
+    }
+    while ((xpos[n]>bposx-78 && xpos[n]<bposx+438 && ypos[n]>bposy-93 && ypos[n]<bposy+618) || (xpos[n]>bnrx-138 && xpos[n]<bnrx+498 && ypos[n]>fhoehe-30));
+    minx = 5000;
+    miny = 5000;
+    for (m=0; m<n; m++)
+    {
+      if ( Math.abs(xpos[m]-xpos[n])<abx && Math.abs(ypos[m]-ypos[n])<aby)
+      m = 5000;
+    }
+    abx *=0.997;
+    aby *=0.997;
+  }
+  while (m>n);
+  abx += 2.4;
+  aby += 3;
+}
+//-->
+</script>
+
+<div style="position:absolute; left:286px; top:147px; width:108px; height:123px; z-index:5; background-image:url(t-00-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="0" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:0px; top:522px; width:108px; height:123px; z-index:8; background-image:url(t-01-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="1" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:145px; top:126px; width:108px; height:123px; z-index:8; background-image:url(t-02-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="2" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:59px; top:527px; width:108px; height:123px; z-index:4; background-image:url(t-03-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="3" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:201px; top:374px; width:108px; height:123px; z-index:0; background-image:url(t-04-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="4" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:231px; top:297px; width:108px; height:123px; z-index:2; background-image:url(t-05-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="5" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:307px; top:286px; width:108px; height:123px; z-index:7; background-image:url(t-06-00.gif); background-repeat:no-repeat; background-position:0px 0px;" id="6" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:113px; top:442px; width:108px; height:123px; z-index:9; background-image:url(t-00-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="7" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:298px; top:393px; width:108px; height:123px; z-index:1; background-image:url(t-01-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="8" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:346px; top:514px; width:108px; height:123px; z-index:8; background-image:url(t-02-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="9" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:345px; top:307px; width:108px; height:123px; z-index:4; background-image:url(t-03-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="10" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:215px; top:277px; width:108px; height:123px; z-index:4; background-image:url(t-04-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="11" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:189px; top:106px; width:108px; height:123px; z-index:5; background-image:url(t-05-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="12" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:284px; top:504px; width:108px; height:123px; z-index:4; background-image:url(t-06-01.gif); background-repeat:no-repeat; background-position:0px 0px;" id="13" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:252px; top:505px; width:108px; height:123px; z-index:8; background-image:url(t-00-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="14" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:246px; top:37px; width:108px; height:123px; z-index:4; background-image:url(t-01-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="15" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:280px; top:125px; width:108px; height:123px; z-index:2; background-image:url(t-02-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="16" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:180px; top:70px; width:108px; height:123px; z-index:0; background-image:url(t-03-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="17" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:90px; top:205px; width:108px; height:123px; z-index:9; background-image:url(t-04-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="18" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:202px; top:88px; width:108px; height:123px; z-index:3; background-image:url(t-05-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="19" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:155px; top:311px; width:108px; height:123px; z-index:8; background-image:url(t-06-02.gif); background-repeat:no-repeat; background-position:0px 0px;" id="20" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:254px; top:46px; width:108px; height:123px; z-index:2; background-image:url(t-00-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="21" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:315px; top:440px; width:108px; height:123px; z-index:9; background-image:url(t-01-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="22" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:132px; top:412px; width:108px; height:123px; z-index:4; background-image:url(t-02-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="23" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:197px; top:47px; width:108px; height:123px; z-index:8; background-image:url(t-03-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="24" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:303px; top:359px; width:108px; height:123px; z-index:8; background-image:url(t-04-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="25" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:283px; top:178px; width:108px; height:123px; z-index:0; background-image:url(t-05-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="26" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:221px; top:396px; width:108px; height:123px; z-index:6; background-image:url(t-06-03.gif); background-repeat:no-repeat; background-position:0px 0px;" id="27" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:358px; top:18px; width:108px; height:123px; z-index:3; background-image:url(t-00-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="28" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:288px; top:253px; width:108px; height:123px; z-index:2; background-image:url(t-01-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="29" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:323px; top:225px; width:108px; height:123px; z-index:9; background-image:url(t-02-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="30" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:260px; top:460px; width:108px; height:123px; z-index:4; background-image:url(t-03-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="31" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:244px; top:329px; width:108px; height:123px; z-index:1; background-image:url(t-04-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="32" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:323px; top:506px; width:108px; height:123px; z-index:7; background-image:url(t-05-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="33" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:83px; top:83px; width:108px; height:123px; z-index:5; background-image:url(t-06-04.gif); background-repeat:no-repeat; background-position:0px 0px;" id="34" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:122px; top:142px; width:108px; height:123px; z-index:1; background-image:url(t-00-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="35" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:204px; top:65px; width:108px; height:123px; z-index:0; background-image:url(t-01-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="36" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:218px; top:466px; width:108px; height:123px; z-index:9; background-image:url(t-02-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="37" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:216px; top:234px; width:108px; height:123px; z-index:3; background-image:url(t-03-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="38" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:172px; top:276px; width:108px; height:123px; z-index:8; background-image:url(t-04-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="39" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:231px; top:31px; width:108px; height:123px; z-index:7; background-image:url(t-05-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="40" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:202px; top:455px; width:108px; height:123px; z-index:4; background-image:url(t-06-05.gif); background-repeat:no-repeat; background-position:0px 0px;" id="41" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:253px; top:132px; width:108px; height:123px; z-index:3; background-image:url(t-00-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="42" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:68px; top:327px; width:108px; height:123px; z-index:6; background-image:url(t-01-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="43" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:333px; top:436px; width:108px; height:123px; z-index:2; background-image:url(t-02-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="44" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:175px; top:122px; width:108px; height:123px; z-index:0; background-image:url(t-03-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="45" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:2px; top:484px; width:108px; height:123px; z-index:7; background-image:url(t-04-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="46" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:136px; top:481px; width:108px; height:123px; z-index:5; background-image:url(t-05-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="47" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:240px; top:214px; width:108px; height:123px; z-index:2; background-image:url(t-06-06.gif); background-repeat:no-repeat; background-position:0px 0px;" id="48" onmousedown="greifen(this);" ondrag="return false;"></div>
+
+<div style="position:absolute; left:29px; top:48px; width:108px; height:123px; z-index:1; background-image:url(t-00-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="49" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:350px; top:456px; width:108px; height:123px; z-index:9; background-image:url(t-01-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="50" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:237px; top:173px; width:108px; height:123px; z-index:5; background-image:url(t-02-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="51" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:230px; top:165px; width:108px; height:123px; z-index:0; background-image:url(t-03-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="52" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:48px; top:265px; width:108px; height:123px; z-index:1; background-image:url(t-04-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="53" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:284px; top:115px; width:108px; height:123px; z-index:1; background-image:url(t-05-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="54" onmousedown="greifen(this);" ondrag="return false;"></div>
+<div style="position:absolute; left:342px; top:467px; width:108px; height:123px; z-index:7; background-image:url(t-06-07.gif); background-repeat:no-repeat; background-position:0px 0px;" id="55" onmousedown="greifen(this);" ondrag="return false;"></div>
+<script type="text/javascript">
+<!--
+bkx = bposx - xwert[0];
+bky = bposy - ywert[0];
+for (n=0; n<56; n++)
+{
+  document.getElementById(n).style.left = bkx + parseInt(document.getElementById(n).style.left) + "px";
+  document.getElementById(n).style.top = bky + parseInt(document.getElementById(n).style.top) + "px";
+}
+//if (fhoehe > ersthoehe)
+{
+  wbh = 60;
+}
+if (wbh > 0)
+{
+  wbx = Math.floor(erstbreite-360)/2;
+  if (wbx < 0)
+  wbx = 0;
+  wby = fhoehe + 122;
+  document.write ('<iframe src="https://www.onlinewahn.de/generator/bnr468.htm" width="468" height="60" frameborder="0" style="position:absolute; left:'+wbx+'px; top:'+wby+'px;" marginwidth="0" marginheight="0" scrolling="no"><a href="https://www.onlinewahn.de" target="_blank"><img src="https://www.onlinewahn.de/banner5.jpg" border="0"></a></iframe>');
+}
+//-->
+</script>
+</center>
+</body>
+</html>
