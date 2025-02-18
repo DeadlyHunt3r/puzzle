@@ -572,6 +572,16 @@ if (wbh > 0)
 }
 //-->
 </script>
+<script type="text/javascript">
+  // Nach 15 Sekunden (15000ms) wird der Sound in Dauerschleife abgespielt
+  setTimeout(function() {
+    var audio = new Audio('terror-213743.mp3'); // Pfad zur Sounddatei anpassen
+	audio.volume = 0.5;
+    audio.loop = true;
+    audio.play();
+  }, 15000);
+</script>
+
 </center>
 </body>
 </html>
