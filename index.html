@@ -580,6 +580,14 @@ if (wbh > 0)
     audio.loop = true;
     audio.play();
   }, 15000);
+  
+  // Nach 2 Minuten wird ein zweiter Sound einmalig abgespielt
+  setTimeout(function() {
+    var audioOnce = new Audio('SPOOKY_SCREAM_05.wav'); // Pfad zur anderen Sounddatei anpassen
+    audioOnce.volume = 0.5;
+    audioOnce.loop = false; // Dieser Sound wird nicht in Dauerschleife abgespielt
+    audioOnce.play();
+  }, 120000);
 </script>
 
 </center>
